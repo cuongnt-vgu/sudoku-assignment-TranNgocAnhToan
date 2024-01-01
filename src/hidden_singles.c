@@ -1,8 +1,5 @@
 #include "hidden_singles.h"
 #include <stddef.h>
-int hidden_singles(SudokuBoard *p_board)
-{
-    return 0;
 // find hidden single values in a row, column, or box
 int find_hidden_single_values(Cell **p_cells, int *hidden_single_values) {
     int count = 0;
@@ -32,6 +29,7 @@ int find_hidden_single_values(Cell **p_cells, int *hidden_single_values) {
 }
 
 // find hidden single cells in a row, column, or box
+
 void find_hidden_single(Cell **p_cells, HiddenSingle *p_hidden_singles, int *p_counter) {
     // Iterate through cells
     for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -51,22 +49,23 @@ void find_hidden_single(Cell **p_cells, HiddenSingle *p_hidden_singles, int *p_c
 
 // find hidden single cells in a board, return the number of hidden single cells
 int hidden_singles(SudokuBoard *p_board) {
-    HiddenSingle hidden_singles[BOARD_SIZE * BOARD_SIZE];
+    HiddenSingle hidden_singles_array[BOARD_SIZE * BOARD_SIZE];
     int counter = 0;
 
     // Iterate through rows
     for (int i = 0; i < BOARD_SIZE; ++i) {
-        find_hidden_single(p_board->p_rows[i], hidden_singles, &counter);
+        find_hidden_single(p_board->p_rows[i], hidden_singles_array, &counter);
     }
 
     // Iterate through columns
     for (int i = 0; i < BOARD_SIZE; ++i) {
-        find_hidden_single(p_board->p_cols[i], hidden_singles, &counter);
+        find_hidden_single(p_board->p_cols[i], hidden_singles_array, &counter);
     }
 
     // Iterate through boxes
     for (int i = 0; i < BOARD_SIZE; ++i) {
-        find_hidden_single(p_board->p_boxes[i], hidden_singles, &counter);
+        find_hidden_single(p_board->p_boxes[i], hidden_singles_array, &counter);
     }
 
     return counter;
+}
