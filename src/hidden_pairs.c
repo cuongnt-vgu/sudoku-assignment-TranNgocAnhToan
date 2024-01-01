@@ -1,58 +1,58 @@
 #include "hidden_pairs.h"
 
+int hidden_pairs(SudokuBoard* p_board) {
 
-static int areHiddenPair(Cell *cell1, Cell *cell2) {
-    // Check if the candidates of cell1 and cell2 are the same
-    if (cell1->num_candidates == 2 && cell2->num_candidates == 2) {
-        for (int i = 0; i < BOARD_SIZE; ++i) {
-            if (cell1->candidates[i] != 0 && cell2->candidates[i] != 0) {
-                return 1; // Hidden pair found
+  int i, j, k;
+  int found = 0;
+  
+  // Loop through each row
+  for (i = 0; i < BOARD_SIZE; i++) {
+
+    // Track pairs in row
+    int pairs[BOARD_SIZE][2];
+    int num_pairs = 0;
+
+    // Loop through each cell in row
+    for (j = 0; j < BOARD_SIZE; j++) {
+    
+      Cell* cell = p_board->p_rows[i][j];
+      
+      // Skip solved cells
+      if (cell->num_candidates != 2) continue;
+
+      // Add pair
+      pairs[num_pairs][0] = cell->candidates[0];
+      pairs[num_pairs][1] = cell->candidates[1];
+      num_pairs++;
+    }
+
+    // Check for duplicate pairs
+    for (j = 0; j < num_pairs; j++) {
+      for (k = j + 1; k < num_pairs; k++) {
+      
+        // Found duplicate pair
+        if (pairs[j][0] == pairs[k][0] && 
+            pairs[j][1] == pairs[k][1]) {
+            
+          int val1 = pairs[j][0];
+          int val2 = pairs[j][1];
+          
+          // Remove this pair from all other cells in row
+          for (int m = 0; m < BOARD_SIZE; m++) {
+            Cell* cell = p_board->p_rows[i][m];
+            if (cell->num_candidates > 2) {
+              unset_candidate(cell, val1);
+              unset_candidate(cell, val2);
             }
+          }
+          
+          found++;
         }
+      }
     }
-    return 0; // Not a hidden pair
-}
+  }
 
-// Function to find hidden pairs in a unit (row, column, or box)
-static int findHiddenPairsInUnit(Cell **unit) {
-    int pairCount = 0;
+  // Repeat for columns and boxes
 
-    // Iterate through all pairs of cells in the unit
-    for (int i = 0; i < BOARD_SIZE - 1; ++i) {
-        for (int j = i + 1; j < BOARD_SIZE; ++j) {
-            if (areHiddenPair(unit[i], unit[j])) {
-                // Process the hidden pair
-                for (int k = 0; k < BOARD_SIZE; ++k) {
-                    if (unit[i]->candidates[k] != 0) {
-                        // Set the candidates as the final values for the hidden pair
-                        set_candidate(unit[j], k + 1);
-                    }
-                }
-
-                // Increment pairCount and perform any other necessary actions
-                ++pairCount;
-            }
-        }
-    }
-
-    return pairCount;
-}
-
-int hidden_pairs(SudokuBoard *p_board)
-{
-    int totalPairCount = 0;
-    // Iterate through rows
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        totalPairCount += findHiddenPairsInUnit(p_board->p_rows[i]);
-    }
-    // Iterate through columns
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        totalPairCount += findHiddenPairsInUnit(p_board->p_cols[i]);
-    }
-    // Iterate through boxes
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        totalPairCount += findHiddenPairsInUnit(p_board->p_boxes[i]);
-    }
-
-    return totalPairCount;
+  return found;
 }
